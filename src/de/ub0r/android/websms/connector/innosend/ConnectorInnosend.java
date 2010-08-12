@@ -119,12 +119,10 @@ public class ConnectorInnosend extends Connector {
 	 * @param failOnError
 	 *            fail if return code is not 10*
 	 * @return true if no error code
-	 * @throws WebSMSException
-	 *             WebSMSException
 	 */
 	private static boolean checkReturnCode(final Context context,
 			final ConnectorSpec connector, final int ret, final String more,
-			final boolean failOnError) throws WebSMSException {
+			final boolean failOnError) {
 		switch (ret) {
 		case 100:
 		case 101:
@@ -158,11 +156,8 @@ public class ConnectorInnosend extends Connector {
 	 * @param ret
 	 *            return code
 	 * @return true if no error code
-	 * @throws WebSMSException
-	 *             WebSMSException
 	 */
-	private static boolean checkReturnCode(final Context context, final int ret)
-			throws WebSMSException {
+	private static boolean checkReturnCode(final Context context, final int ret) {
 		switch (ret) {
 		case 100:
 		case 101:
@@ -209,12 +204,9 @@ public class ConnectorInnosend extends Connector {
 	 *            ConnectorCommand
 	 * @param updateFree
 	 *            update free sms
-	 * @throws WebSMSException
-	 *             WebSMSException
 	 */
 	private void sendData(final Context context,
-			final ConnectorCommand command, final boolean updateFree)
-			throws WebSMSException {
+			final ConnectorCommand command, final boolean updateFree) {
 		// do IO
 		try { // get Connection
 			final ConnectorSpec cs = this.getSpec(context);
@@ -278,7 +270,7 @@ public class ConnectorInnosend extends Connector {
 			d.add(new BasicNameValuePair("pw", p.getString(
 					Preferences.PREFS_PASSWORD, "")));
 			HttpResponse response = Utils.getHttpClient(url.toString(), null,
-					d, null, null);
+					d, null, null, false);
 			int resp = response.getStatusLine().getStatusCode();
 			if (resp != HttpURLConnection.HTTP_OK) {
 				throw new WebSMSException(context, R.string.error_http, " "
@@ -314,8 +306,7 @@ public class ConnectorInnosend extends Connector {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected final void doUpdate(final Context context, final Intent intent)
-			throws WebSMSException {
+	protected final void doUpdate(final Context context, final Intent intent) {
 		final ConnectorCommand c = new ConnectorCommand(intent);
 		this.sendData(context, c, false);
 		this.sendData(context, c, true);
@@ -325,8 +316,7 @@ public class ConnectorInnosend extends Connector {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected final void doSend(final Context context, final Intent intent)
-			throws WebSMSException {
+	protected final void doSend(final Context context, final Intent intent) {
 		this.sendData(context, new ConnectorCommand(intent), false);
 	}
 }
