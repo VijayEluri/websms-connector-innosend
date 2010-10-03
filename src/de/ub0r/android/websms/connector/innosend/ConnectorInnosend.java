@@ -54,6 +54,9 @@ public class ConnectorInnosend extends Connector {
 	/** {@link SubConnectorSpec} ID: without sender. */
 	private static final String ID_WO_SENDER = "wo_sender";
 
+	/** Maximal length. */
+	private static final int MAX_LENGTH = 160;
+
 	/** Innosend Gateway URL. */
 	private static final String URL = "https://www.innosend.de/gateway/";
 
@@ -228,8 +231,15 @@ public class ConnectorInnosend extends Connector {
 				d.add(new BasicNameValuePair("text", text));
 				if (subCon.equals(ID_W_SENDER)) {
 					d.add(new BasicNameValuePair("type", "4"));
+					if (text.length() > MAX_LENGTH) {
+						d.add(new BasicNameValuePair("maxi", "1"));
+					}
 				} else {
 					d.add(new BasicNameValuePair("type", "2"));
+					if (text.length() > MAX_LENGTH) {
+						throw new WebSMSException(context,
+								R.string.error_length);
+					}
 				}
 				d.add(new BasicNameValuePair("empfaenger", Utils
 						.joinRecipientsNumbers(command.getRecipients(), ",",

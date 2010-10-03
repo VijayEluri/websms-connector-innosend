@@ -24,6 +24,7 @@
 	<string name="w_sender">mit Absender</string>
 	<string name="wo_sender">ohne Absender</string>
 
+	<string name="error_length">Lange SMS nur mit Absender erlaubt</string>
 	<string name="error_innosend_111">IP-Sperre aktiv</string>
 	<string name="error_innosend_120">Absender fehlt</string>
 	<string name="error_innosend_121">Parameter fehlt: Type</string>
