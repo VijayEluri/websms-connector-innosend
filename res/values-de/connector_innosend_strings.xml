@@ -23,6 +23,8 @@
 	<string name="free">free</string>
 	<string name="w_sender">mit Absender</string>
 	<string name="wo_sender">ohne Absender</string>
+	<string name="ignore_type3_">Verstecke "Type 3" SubConnector</string>
+	<string name="ignore_type3_hint">Verstecke "type 3" SubConnector in der Auswahl.</string>
 
 	<string name="error_length">Lange SMS nur mit Absender erlaubt</string>
 	<string name="error_innosend_111">IP-Sperre aktiv</string>

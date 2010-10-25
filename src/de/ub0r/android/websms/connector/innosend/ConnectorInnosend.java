@@ -49,10 +49,20 @@ public class ConnectorInnosend extends Connector {
 
 	/** {@link SubConnectorSpec} ID: free. */
 	private static final String ID_FREE = "";
+	/** {@link SubConnectorSpec} ID: type3. */
+	private static final String ID_TYPE3 = "type3";
 	/** {@link SubConnectorSpec} ID: with sender. */
 	private static final String ID_W_SENDER = "w_sender";
 	/** {@link SubConnectorSpec} ID: without sender. */
 	private static final String ID_WO_SENDER = "wo_sender";
+	/** Preference's name: hide free subcon. */
+	private static final String PREFS_HIDE_FREE = "hide_free";
+	/** Preference's name: hide with sender subcon. */
+	private static final String PREFS_HIDE_W_SENDER = "hide_withsender";
+	/** Preference's name: hide without sender subcon. */
+	private static final String PREFS_HIDE_WO_SENDER = "hide_nosender";
+	/** Preference's name: hide type3 subcon. */
+	private static final String PREFS_HIDE_TYPE3 = "hide_type3";
 
 	/** Maximal length. */
 	private static final int MAX_LENGTH = 160;
@@ -75,14 +85,28 @@ public class ConnectorInnosend extends Connector {
 		c.setCapabilities(ConnectorSpec.CAPABILITIES_UPDATE
 				| ConnectorSpec.CAPABILITIES_SEND
 				| ConnectorSpec.CAPABILITIES_PREFS);
-		c.addSubConnector(ID_FREE, context.getString(R.string.free),
-				SubConnectorSpec.FEATURE_NONE);
-		c.addSubConnector(ID_WO_SENDER, context.getString(R.string.wo_sender),
-				SubConnectorSpec.FEATURE_SENDLATER
-						| SubConnectorSpec.FEATURE_FLASHSMS);
-		c.addSubConnector(ID_W_SENDER, context.getString(R.string.w_sender),
-				SubConnectorSpec.FEATURE_CUSTOMSENDER
-						| SubConnectorSpec.FEATURE_SENDLATER);
+		final SharedPreferences p = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		if (!p.getBoolean(PREFS_HIDE_FREE, false)) {
+			c.addSubConnector(ID_FREE, context.getString(R.string.free),
+					SubConnectorSpec.FEATURE_NONE);
+		}
+		if (!p.getBoolean(PREFS_HIDE_TYPE3, false)) {
+			c.addSubConnector(ID_TYPE3, context.getString(R.string.type3),
+					SubConnectorSpec.FEATURE_NONE);
+		}
+		if (!p.getBoolean(PREFS_HIDE_WO_SENDER, false)) {
+			c.addSubConnector(ID_WO_SENDER, context
+					.getString(R.string.wo_sender),
+					SubConnectorSpec.FEATURE_SENDLATER
+							| SubConnectorSpec.FEATURE_FLASHSMS);
+		}
+		if (!p.getBoolean(PREFS_HIDE_W_SENDER, false)) {
+			c.addSubConnector(ID_W_SENDER,
+					context.getString(R.string.w_sender),
+					SubConnectorSpec.FEATURE_CUSTOMSENDER
+							| SubConnectorSpec.FEATURE_SENDLATER);
+		}
 		return c;
 	}
 
@@ -234,8 +258,14 @@ public class ConnectorInnosend extends Connector {
 					if (text.length() > MAX_LENGTH) {
 						d.add(new BasicNameValuePair("maxi", "1"));
 					}
-				} else {
+				} else if (subCon.equals(ID_WO_SENDER)) {
 					d.add(new BasicNameValuePair("type", "2"));
+					if (text.length() > MAX_LENGTH) {
+						throw new WebSMSException(context,
+								R.string.error_length);
+					}
+				} else {
+					d.add(new BasicNameValuePair("type", "3"));
 					if (text.length() > MAX_LENGTH) {
 						throw new WebSMSException(context,
 								R.string.error_length);
@@ -280,7 +310,7 @@ public class ConnectorInnosend extends Connector {
 			d.add(new BasicNameValuePair("pw", p.getString(
 					Preferences.PREFS_PASSWORD, "")));
 			HttpResponse response = Utils.getHttpClient(url.toString(), null,
-					d, null, null, false);
+					d, null, null, null, false);
 			int resp = response.getStatusLine().getStatusCode();
 			if (resp != HttpURLConnection.HTTP_OK) {
 				throw new WebSMSException(context, R.string.error_http, " "
@@ -318,8 +348,16 @@ public class ConnectorInnosend extends Connector {
 	@Override
 	protected final void doUpdate(final Context context, final Intent intent) {
 		final ConnectorCommand c = new ConnectorCommand(intent);
-		this.sendData(context, c, false);
-		this.sendData(context, c, true);
+		final SharedPreferences p = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		if (!p.getBoolean(PREFS_HIDE_TYPE3, false)
+				|| !p.getBoolean(PREFS_HIDE_WO_SENDER, false)
+				|| !p.getBoolean(PREFS_HIDE_W_SENDER, false)) {
+			this.sendData(context, c, false);
+		}
+		if (!p.getBoolean(PREFS_HIDE_FREE, false)) {
+			this.sendData(context, c, true);
+		}
 	}
 
 	/**

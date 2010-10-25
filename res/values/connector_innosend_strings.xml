@@ -29,6 +29,9 @@
 	<string name="free">free</string>
 	<string name="w_sender">w/ sender</string>
 	<string name="wo_sender">w/o sender</string>
+	<string name="type3">Type 3</string>
+	<string name="ignore_type3_">Hide "type 3" SubConnector</string>
+	<string name="ignore_type3_hint">Hide "type 3" SubConnector from selection.</string>
 
 	<string name="error_length">Long SMS onle supported with Sender</string>
 	<string name="error_innosend_111">IP-blocking active</string>
