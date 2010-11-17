@@ -25,7 +25,9 @@
 	<string name="wo_sender">ohne Absender</string>
 	<string name="ignore_type3_">Verstecke "Type 3" SubConnector</string>
 	<string name="ignore_type3_hint">Verstecke "type 3" SubConnector in der Auswahl.</string>
-
+	<string name="retmail_">Mail für Antworten</string>
+	<string name="retmail_hint">Mailadresse für Rückantworten.</string>
+	
 	<string name="error_length">Lange SMS nur mit Absender erlaubt</string>
 	<string name="error_innosend_111">IP-Sperre aktiv</string>
 	<string name="error_innosend_120">Absender fehlt</string>

@@ -32,6 +32,8 @@
 	<string name="type3">Type 3</string>
 	<string name="ignore_type3_">Hide "type 3" SubConnector</string>
 	<string name="ignore_type3_hint">Hide "type 3" SubConnector from selection.</string>
+	<string name="retmail_">Mail for answers</string>
+	<string name="retmail_hint">Mail address for answers.</string>
 
 	<string name="error_length">Long SMS onle supported with Sender</string>
 	<string name="error_innosend_111">IP-blocking active</string>

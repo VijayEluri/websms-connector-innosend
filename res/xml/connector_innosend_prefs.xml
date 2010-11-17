@@ -39,6 +39,10 @@
 		android:title="@string/ignore_withsender_" android:summary="@string/ignore_withsender_hint"
 		android:disableDependentsState="true" android:dependency="enable_innosend" />
 
+	<EditTextPreference android:key="retmail"
+		android:title="@string/retmail_" android:summary="@string/retmail_hint"
+		android:disableDependentsState="true" android:dependency="enable_innosend" />
+
 	<CheckBoxPreference android:key="use_default_sender"
 		android:defaultValue="true" android:title="@string/use_derfault_sender_"
 		android:summary="@string/use_derfault_sender_hint"

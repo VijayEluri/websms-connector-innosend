@@ -63,6 +63,8 @@ public class ConnectorInnosend extends Connector {
 	private static final String PREFS_HIDE_WO_SENDER = "hide_nosender";
 	/** Preference's name: hide type3 subcon. */
 	private static final String PREFS_HIDE_TYPE3 = "hide_type3";
+	/** Preference's name: return mail. */
+	private static final String PREFS_RETMAIL = "retmail";
 
 	/** Maximal length. */
 	private static final int MAX_LENGTH = 160;
@@ -283,6 +285,10 @@ public class ConnectorInnosend extends Connector {
 											.getDefSender()))));
 				} else {
 					d.add(new BasicNameValuePair("absender", customSender));
+				}
+				final String rm = p.getString(PREFS_RETMAIL, "");
+				if (rm != null && rm.length() > 2) {
+					d.add(new BasicNameValuePair("reply_email", rm));
 				}
 
 				if (command.getFlashSMS()) {
