@@ -233,118 +233,113 @@ public class ConnectorInnosend extends Connector {
 	 *            ConnectorCommand
 	 * @param updateFree
 	 *            update free sms
+	 * @throws IOException
+	 *             IOException
 	 */
 	private void sendData(final Context context,
-			final ConnectorCommand command, final boolean updateFree) {
-		// do IO
-		try { // get Connection
-			final ConnectorSpec cs = this.getSpec(context);
-			final SharedPreferences p = PreferenceManager
-					.getDefaultSharedPreferences(context);
-			final StringBuilder url = new StringBuilder(URL);
-			final ArrayList<BasicNameValuePair> d = // .
-			new ArrayList<BasicNameValuePair>();
-			final String text = command.getText();
-			if (text != null && text.length() > 0) {
-				final String subCon = command.getSelectedSubConnector();
-				if (subCon.equals(ID_FREE)) {
-					url.append("free.php");
-					d.add(new BasicNameValuePair("app", "1"));
-					d.add(new BasicNameValuePair("was", "iphone"));
-				} else {
-					url.append("sms.php");
+			final ConnectorCommand command, final boolean updateFree)
+			throws IOException {
+		// get Connection
+		final ConnectorSpec cs = this.getSpec(context);
+		final SharedPreferences p = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		final StringBuilder url = new StringBuilder(URL);
+		final ArrayList<BasicNameValuePair> d = // .
+		new ArrayList<BasicNameValuePair>();
+		final String text = command.getText();
+		if (text != null && text.length() > 0) {
+			final String subCon = command.getSelectedSubConnector();
+			if (subCon.equals(ID_FREE)) {
+				url.append("free.php");
+				d.add(new BasicNameValuePair("app", "1"));
+				d.add(new BasicNameValuePair("was", "iphone"));
+			} else {
+				url.append("sms.php");
+			}
+			d.add(new BasicNameValuePair("text", text));
+			if (subCon.equals(ID_W_SENDER)) {
+				d.add(new BasicNameValuePair("type", "4"));
+				if (text.length() > MAX_LENGTH) {
+					d.add(new BasicNameValuePair("maxi", "1"));
 				}
-				d.add(new BasicNameValuePair("text", text));
-				if (subCon.equals(ID_W_SENDER)) {
-					d.add(new BasicNameValuePair("type", "4"));
-					if (text.length() > MAX_LENGTH) {
-						d.add(new BasicNameValuePair("maxi", "1"));
-					}
-				} else if (subCon.equals(ID_WO_SENDER)) {
-					d.add(new BasicNameValuePair("type", "2"));
-					if (text.length() > MAX_LENGTH) {
-						throw new WebSMSException(context,
-								R.string.error_length);
-					}
-				} else {
-					d.add(new BasicNameValuePair("type", "3"));
-					if (text.length() > MAX_LENGTH) {
-						throw new WebSMSException(context,
-								R.string.error_length);
-					}
-				}
-				d.add(new BasicNameValuePair("empfaenger", Utils
-						.joinRecipientsNumbers(command.getRecipients(), ",",
-								true)));
-
-				final String customSender = command.getCustomSender();
-				if (customSender == null) {
-					d.add(new BasicNameValuePair("absender", Utils
-							.international2national(command.getDefPrefix(),
-									Utils.getSender(context, command
-											.getDefSender()))));
-				} else {
-					d.add(new BasicNameValuePair("absender", customSender));
-				}
-				final String rm = p.getString(PREFS_RETMAIL, "");
-				if (rm != null && rm.length() > 2) {
-					d.add(new BasicNameValuePair("reply_email", rm));
-				}
-
-				if (command.getFlashSMS()) {
-					d.add(new BasicNameValuePair("flash", "1"));
-				}
-				long sendLater = command.getSendLater();
-				if (sendLater > 0) {
-					if (sendLater <= 0) {
-						sendLater = System.currentTimeMillis();
-					}
-					d.add(new BasicNameValuePair("termin", DateFormat.format(
-							DATEFORMAT, sendLater).toString()));
+			} else if (subCon.equals(ID_WO_SENDER)) {
+				d.add(new BasicNameValuePair("type", "2"));
+				if (text.length() > MAX_LENGTH) {
+					throw new WebSMSException(context, R.string.error_length);
 				}
 			} else {
-				if (updateFree) {
-					url.append("free.php");
-					d.add(new BasicNameValuePair("app", "1"));
-					d.add(new BasicNameValuePair("was", "iphone"));
-				} else {
-					url.append("konto.php");
+				d.add(new BasicNameValuePair("type", "3"));
+				if (text.length() > MAX_LENGTH) {
+					throw new WebSMSException(context, R.string.error_length);
 				}
 			}
-			d.add(new BasicNameValuePair("id", p.getString(
-					Preferences.PREFS_USER, "")));
-			d.add(new BasicNameValuePair("pw", p.getString(
-					Preferences.PREFS_PASSWORD, "")));
-			HttpResponse response = Utils.getHttpClient(url.toString(), null,
-					d, null, null, null, false);
-			int resp = response.getStatusLine().getStatusCode();
-			if (resp != HttpURLConnection.HTTP_OK) {
-				throw new WebSMSException(context, R.string.error_http, " "
-						+ resp);
-			}
-			String htmlText = Utils.stream2str(
-					response.getEntity().getContent()).trim();
-			int i = htmlText.indexOf(',');
-			if (i > 0 && !updateFree) {
-				cs.setBalance(htmlText.substring(0, i + 3) + "\u20AC");
+			d
+					.add(new BasicNameValuePair("empfaenger", Utils
+							.joinRecipientsNumbers(command.getRecipients(),
+									",", true)));
+
+			final String customSender = command.getCustomSender();
+			if (customSender == null) {
+				d.add(new BasicNameValuePair("absender", Utils
+						.international2national(command.getDefPrefix(), Utils
+								.getSender(context, command.getDefSender()))));
 			} else {
-				i = htmlText.indexOf("<br>");
-				int ret;
-				Log.d(TAG, url.toString());
-				if (i < 0) {
-					ret = Integer.parseInt(htmlText);
-					if (!updateFree) {
-						ConnectorInnosend.checkReturnCode(context, ret);
-					}
-				} else {
-					ret = Integer.parseInt(htmlText.substring(0, i));
-					ConnectorInnosend.checkReturnCode(context, cs, ret,
-							htmlText.substring(i + 4).trim(), !updateFree);
-				}
+				d.add(new BasicNameValuePair("absender", customSender));
 			}
-		} catch (IOException e) {
-			Log.e(TAG, null, e);
-			throw new WebSMSException(e.getMessage());
+			final String rm = p.getString(PREFS_RETMAIL, "");
+			if (rm != null && rm.length() > 2) {
+				d.add(new BasicNameValuePair("reply_email", rm));
+			}
+
+			if (command.getFlashSMS()) {
+				d.add(new BasicNameValuePair("flash", "1"));
+			}
+			long sendLater = command.getSendLater();
+			if (sendLater > 0) {
+				if (sendLater <= 0) {
+					sendLater = System.currentTimeMillis();
+				}
+				d.add(new BasicNameValuePair("termin", DateFormat.format(
+						DATEFORMAT, sendLater).toString()));
+			}
+		} else {
+			if (updateFree) {
+				url.append("free.php");
+				d.add(new BasicNameValuePair("app", "1"));
+				d.add(new BasicNameValuePair("was", "iphone"));
+			} else {
+				url.append("konto.php");
+			}
+		}
+		d.add(new BasicNameValuePair("id", p.getString(Preferences.PREFS_USER,
+				"")));
+		d.add(new BasicNameValuePair("pw", p.getString(
+				Preferences.PREFS_PASSWORD, "")));
+		HttpResponse response = Utils.getHttpClient(url.toString(), null, d,
+				null, null, null, false);
+		int resp = response.getStatusLine().getStatusCode();
+		if (resp != HttpURLConnection.HTTP_OK) {
+			throw new WebSMSException(context, R.string.error_http, " " + resp);
+		}
+		String htmlText = Utils.stream2str(response.getEntity().getContent())
+				.trim();
+		int i = htmlText.indexOf(',');
+		if (i > 0 && !updateFree) {
+			cs.setBalance(htmlText.substring(0, i + 3) + "\u20AC");
+		} else {
+			i = htmlText.indexOf("<br>");
+			int ret;
+			Log.d(TAG, url.toString());
+			if (i < 0) {
+				ret = Integer.parseInt(htmlText);
+				if (!updateFree) {
+					ConnectorInnosend.checkReturnCode(context, ret);
+				}
+			} else {
+				ret = Integer.parseInt(htmlText.substring(0, i));
+				ConnectorInnosend.checkReturnCode(context, cs, ret, htmlText
+						.substring(i + 4).trim(), !updateFree);
+			}
 		}
 	}
 
@@ -352,7 +347,8 @@ public class ConnectorInnosend extends Connector {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected final void doUpdate(final Context context, final Intent intent) {
+	protected final void doUpdate(final Context context, final Intent intent)
+			throws IOException {
 		final ConnectorCommand c = new ConnectorCommand(intent);
 		final SharedPreferences p = PreferenceManager
 				.getDefaultSharedPreferences(context);
@@ -370,7 +366,8 @@ public class ConnectorInnosend extends Connector {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected final void doSend(final Context context, final Intent intent) {
+	protected final void doSend(final Context context, final Intent intent)
+			throws IOException {
 		this.sendData(context, new ConnectorCommand(intent), false);
 	}
 }
