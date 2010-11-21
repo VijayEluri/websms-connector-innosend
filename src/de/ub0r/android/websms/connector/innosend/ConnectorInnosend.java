@@ -289,6 +289,7 @@ public class ConnectorInnosend extends Connector {
 			final String rm = p.getString(PREFS_RETMAIL, "");
 			if (rm != null && rm.length() > 2) {
 				d.add(new BasicNameValuePair("reply_email", rm));
+				d.add(new BasicNameValuePair("reply", "1"));
 			}
 
 			if (command.getFlashSMS()) {
