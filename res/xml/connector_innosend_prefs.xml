@@ -27,7 +27,7 @@
 		android:inputType="textPassword" android:title="@string/password_"
 		android:dialogTitle="@string/password_" android:dependency="enable_innosend" />
 	<CheckBoxPreference android:key="hide_free"
-		android:title="@string/ignore_withsender_" android:summary="@string/ignore_free_hint"
+		android:title="@string/ignore_free_" android:summary="@string/ignore_free_hint"
 		android:disableDependentsState="true" android:dependency="enable_innosend" />
 	<CheckBoxPreference android:key="hide_nosender"
 		android:title="@string/ignore_nosender_" android:summary="@string/ignore_nosender_hint"
@@ -39,9 +39,13 @@
 		android:title="@string/ignore_withsender_" android:summary="@string/ignore_withsender_hint"
 		android:disableDependentsState="true" android:dependency="enable_innosend" />
 
-	<EditTextPreference android:key="retmail"
-		android:title="@string/retmail_" android:summary="@string/retmail_hint"
-		android:disableDependentsState="true" android:dependency="enable_innosend" />
+	<!--
+		<EditTextPreference android:key="retmail"
+		android:title="@string/retmail_"
+		android:summary="@string/retmail_hint"
+		android:disableDependentsState="true"
+		android:dependency="enable_innosend" />
+	-->
 
 	<CheckBoxPreference android:key="use_default_sender"
 		android:defaultValue="true" android:title="@string/use_derfault_sender_"
