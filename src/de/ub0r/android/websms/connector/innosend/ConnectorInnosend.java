@@ -48,7 +48,7 @@ public class ConnectorInnosend extends Connector {
 	private static final String TAG = "inno";
 
 	/** {@link SubConnectorSpec} ID: free. */
-	private static final String ID_FREE = "";
+	private static final String ID_FREE = "free";
 	/** {@link SubConnectorSpec} ID: type3. */
 	private static final String ID_TYPE3 = "type3";
 	/** {@link SubConnectorSpec} ID: with sender. */
