@@ -33,10 +33,11 @@ import android.text.format.DateFormat;
 import de.ub0r.android.websms.connector.common.Connector;
 import de.ub0r.android.websms.connector.common.ConnectorCommand;
 import de.ub0r.android.websms.connector.common.ConnectorSpec;
+import de.ub0r.android.websms.connector.common.ConnectorSpec.SubConnectorSpec;
 import de.ub0r.android.websms.connector.common.Log;
 import de.ub0r.android.websms.connector.common.Utils;
+import de.ub0r.android.websms.connector.common.Utils.HttpOptions;
 import de.ub0r.android.websms.connector.common.WebSMSException;
-import de.ub0r.android.websms.connector.common.ConnectorSpec.SubConnectorSpec;
 
 /**
  * AsyncTask to manage IO to Innosend.de API.
@@ -98,8 +99,8 @@ public class ConnectorInnosend extends Connector {
 					SubConnectorSpec.FEATURE_NONE);
 		}
 		if (!p.getBoolean(PREFS_HIDE_WO_SENDER, false)) {
-			c.addSubConnector(ID_WO_SENDER, context
-					.getString(R.string.wo_sender),
+			c.addSubConnector(ID_WO_SENDER,
+					context.getString(R.string.wo_sender),
 					SubConnectorSpec.FEATURE_SENDLATER
 							| SubConnectorSpec.FEATURE_FLASHSMS);
 		}
@@ -273,10 +274,8 @@ public class ConnectorInnosend extends Connector {
 					throw new WebSMSException(context, R.string.error_length);
 				}
 			}
-			d
-					.add(new BasicNameValuePair("empfaenger", Utils
-							.joinRecipientsNumbers(command.getRecipients(),
-									",", true)));
+			d.add(new BasicNameValuePair("empfaenger", Utils
+					.joinRecipientsNumbers(command.getRecipients(), ",", true)));
 
 			final String customSender = command.getCustomSender();
 			if (customSender == null) {
@@ -316,8 +315,11 @@ public class ConnectorInnosend extends Connector {
 				"")));
 		d.add(new BasicNameValuePair("pw", p.getString(
 				Preferences.PREFS_PASSWORD, "")));
-		HttpResponse response = Utils.getHttpClient(url.toString(), null, d,
-				null, null, null, false);
+		HttpOptions o = new HttpOptions();
+		o.url = url.toString();
+		o.addFormParameter(d);
+		o.trustAll = true;
+		HttpResponse response = Utils.getHttpClient(o);
 		int resp = response.getStatusLine().getStatusCode();
 		if (resp != HttpURLConnection.HTTP_OK) {
 			throw new WebSMSException(context, R.string.error_http, " " + resp);
